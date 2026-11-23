@@ -108,5 +108,3 @@ To deploy your own version:
 4. Deploy the application and access it through the generated Vercel URL.
 
 ---
-
-Developed as part of the **Software Engineer Internship Technical Assessment at CoLearn**.
