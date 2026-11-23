@@ -3,85 +3,81 @@ import Board from "./components/Board";
 import Scoreboard from "./components/Scoreboard";
 import "./App.css";
 
-const winningCombinations = [
+const WINNING_LINES = [
   [0, 1, 2],
   [3, 4, 5],
   [6, 7, 8],
-
   [0, 3, 6],
   [1, 4, 7],
   [2, 5, 8],
-
   [0, 4, 8],
   [2, 4, 6],
 ];
 
-// Returns { winner: "X" | "O", line: [a, b, c] } or null
-function checkWinner(board) {
-  for (const combination of winningCombinations) {
-    const [a, b, c] = combination;
-
+function getWinner(board) {
+  for (const line of WINNING_LINES) {
+    const [a, b, c] = line;
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return { winner: board[a], line: combination };
+      return { winner: board[a], line };
     }
   }
-
   return null;
 }
 
-function App() {
+export default function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
-  const [xIsNext, setXIsNext] = useState(true);
+  const [isXTurn, setIsXTurn] = useState(true);
   const [scores, setScores] = useState({ X: 0, O: 0, draws: 0 });
 
-  const result = checkWinner(board);
-  const winner = result ? result.winner : null;
-  const winningLine = result ? result.line : [];
-  const isDraw = !winner && board.every((square) => square !== null);
-  const gameOver = Boolean(winner) || isDraw;
+  const winData = getWinner(board);
+  const winner = winData?.winner ?? null;
+  const winningLine = winData?.line ?? [];
+  const isDraw = !winner && board.every(Boolean);
+  const gameOver = Boolean(winner || isDraw);
 
-  function handleSquareClick(index) {
-    // Ignore clicks on filled squares or after the game has ended
+  const handleSquareClick = (index) => {
     if (board[index] || gameOver) return;
 
-    const newBoard = [...board];
-    newBoard[index] = xIsNext ? "X" : "O";
-    setBoard(newBoard);
+    const nextBoard = [...board];
+    nextBoard[index] = isXTurn ? "X" : "O";
+    setBoard(nextBoard);
 
-    const newResult = checkWinner(newBoard);
-
-    if (newResult) {
-      // Score is updated right here (once per game), not in an effect,
-      // so it can never be counted twice.
-      setScores((prev) => ({ ...prev, [newResult.winner]: prev[newResult.winner] + 1 }));
-    } else if (newBoard.every((square) => square !== null)) {
+    const nextWin = getWinner(nextBoard);
+    if (nextWin) {
+      setScores((prev) => ({
+        ...prev,
+        [nextWin.winner]: prev[nextWin.winner] + 1,
+      }));
+    } else if (nextBoard.every(Boolean)) {
       setScores((prev) => ({ ...prev, draws: prev.draws + 1 }));
     } else {
-      setXIsNext(!xIsNext);
+      setIsXTurn((prev) => !prev);
     }
-  }
+  };
 
-  function handleRestart() {
+  const restartGame = () => {
     setBoard(Array(9).fill(null));
-    setXIsNext(true);
-  }
+    setIsXTurn(true);
+  };
 
-  function handleResetScores() {
+  const resetAll = () => {
     setScores({ X: 0, O: 0, draws: 0 });
-    handleRestart();
-  }
+    restartGame();
+  };
 
-  let status;
-  let statusClass = "status";
-  if (winner) {
-    status = `🎉 Player ${winner} wins!`;
-    statusClass += " status--win";
-  } else if (isDraw) {
-    status = "🤝 It's a draw!";
-    statusClass += " status--draw";
-  } else {
-    status = `Player ${xIsNext ? "X" : "O"}'s turn`;
-  }
+  const getStatusMessage = () => {
+    if (winner) return `🎉 Player ${winner} wins!`;
+    if (isDraw) return "🤝 It's a draw!";
+    return `Player ${isXTurn ? "X" : "O"}'s turn`;
+  };
+
+  const statusClass = [
+    "status",
+    winner && "status--win",
+    isDraw && "status--draw",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <main className="app">
@@ -90,7 +86,7 @@ function App() {
       <Scoreboard scores={scores} />
 
       <p className={statusClass} aria-live="polite">
-        {status}
+        {getStatusMessage()}
       </p>
 
       <Board
@@ -101,15 +97,13 @@ function App() {
       />
 
       <div className="actions">
-        <button className="btn btn--primary" onClick={handleRestart}>
+        <button className="btn btn--primary" onClick={restartGame}>
           Restart Game
         </button>
-        <button className="btn btn--secondary" onClick={handleResetScores}>
+        <button className="btn btn--secondary" onClick={resetAll}>
           Reset Scores
         </button>
       </div>
     </main>
   );
 }
-
-export default App;
