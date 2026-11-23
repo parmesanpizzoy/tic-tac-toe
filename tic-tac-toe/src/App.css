@@ -1,0 +1,162 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Scoreboard ---------- */
+.scoreboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: min(100%, 380px);
+}
+
+.score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  background: var(--surface);
+  border-radius: 12px;
+  border-bottom: 3px solid var(--muted);
+}
+
+.score--x {
+  border-bottom-color: var(--x-color);
+}
+
+.score--o {
+  border-bottom-color: var(--o-color);
+}
+
+.score__label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.score__value {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* ---------- Status ---------- */
+.status {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  min-height: 1.6em;
+  text-align: center;
+}
+
+.status--win {
+  color: var(--win);
+}
+
+.status--draw {
+  color: var(--muted);
+}
+
+/* ---------- Board ---------- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  width: min(100%, 380px);
+  aspect-ratio: 1 / 1;
+}
+
+.square {
+  background: var(--surface);
+  border: none;
+  border-radius: 14px;
+  font-size: clamp(2.5rem, 14vw, 4rem);
+  font-weight: 800;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.square:hover:not(:disabled) {
+  background: var(--surface-hover);
+  transform: scale(1.03);
+}
+
+.square:disabled {
+  cursor: not-allowed;
+}
+
+.square--x {
+  color: var(--x-color);
+}
+
+.square--o {
+  color: var(--o-color);
+}
+
+.square--winning {
+  background: rgba(74, 222, 128, 0.2);
+  outline: 3px solid var(--win);
+}
+
+/* ---------- Buttons ---------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.btn {
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn--primary {
+  background: var(--x-color);
+  color: #082f49;
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--muted);
+}
+
+/* ---------- Responsive ---------- */
+@media (min-width: 768px) {
+  .app {
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .scoreboard,
+  .board {
+    width: 420px;
+  }
+}
+
+@media (max-width: 360px) {
+  .board {
+    gap: 0.4rem;
+  }
+}
